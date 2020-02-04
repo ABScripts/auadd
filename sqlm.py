@@ -1,9 +1,10 @@
 import sqlite3 as sq
 
-class Sqlm():
+
+class Sqlm:
 
     def __init__(self, basename, src, dest):
-        self.database = sq.connect(basename)
+        self.database = sq.connect(basename,  check_same_thread=False)
         self.open_base(src, dest)
 
     def open_base(self, src, dest):
