@@ -1,4 +1,4 @@
-from pynput.keyboard import Key, KeyCode, Listener
+from pynput.keyboard import Key, KeyCode
 from keys import Keys
 
 
@@ -13,7 +13,7 @@ class KeyboardController:
                 if key in Keys.keys.keys():
                     combination.append(Keys.keys[key])
                 else:
-                    ccombination.append(KeyCode(char=key))
+                    combination.append(KeyCode(char=key))
 
             self.combinations[frozenset(combination)] = f_to_call
 

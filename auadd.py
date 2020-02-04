@@ -7,6 +7,7 @@ import re
 
 from beeper import Beeper
 from googletrans import Translator
+from pynput.keyboard import Listener
 from keyboardcontroller import KeyboardController
 
 
@@ -20,7 +21,10 @@ class Dictionary:
         self.last_check = ""
         self.alert_sound = Beeper(1000, 100)
         self.database = sqlm.Sqlm('data', src, dest)
-        self.keyboard = KeyboardController([['shift', 'E'], 's', 'c'], [self.exit, self.show, self.copy])
+        self.keyboard = KeyboardController(
+            [ ['shift', 'E'], ['shift', 'S'], ['shift', 'C'], ['shift', 'Q']],
+              [self.exit, self.show, self.copy, self.sound_state])
+
         self.detect()
 
     def detect(self):
@@ -47,17 +51,17 @@ class Dictionary:
     def connect(self):
 
         alerted = False
-        while True:
+        while not self.to_exit:
             try:
                 requests.get("https://www.google.com/")
                 if alerted:
                     self.alert_sound.beep()
-                    print("/aThe Internet connection was resumed!")
+                    print("The Internet connection was resumed!")
                 return True
             except:
                 if not alerted:
                     self.alert_sound.beep()
-                    print("//aWaiting for the Internet connection...")
+                    print("Waiting for the Internet connection...")
                     alerted = True
             time.sleep(1)
 
@@ -97,7 +101,6 @@ class Dictionary:
     def copy(self):
         items = self.database.is_filled()
         if not items:
-            self.alert_sound.beep()
             return print('This dictionary is empty!')
 
         filename = self.filename('.txt')
@@ -111,12 +114,10 @@ class Dictionary:
         # if this table is an empty one, we will inform a user
         # otherwise, this method will return the list with the items
         if not items:
-            self.alert_sound.beep()
             return print('This dictionary is empty!')
         print("{filename:^30}".format(filename = self.filename()))
         for word, tword in items:
             print("{word:-<15}{tword:->15}".format(word = word, tword = tword))
-        print("showing!")
 
     def sound_state(self):
         if self.alert_sound.duration == 0:  # if souund was disabled we turn it on
